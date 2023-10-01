@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Newtonsoft.Json;
+using NuGet.Frameworks;
 using System.Diagnostics;
 using System.Net;
 using System.Xml.Linq;
@@ -76,7 +77,7 @@ namespace TodoManager.Test
         }
 
         [Fact]
-        public async Task Get_Task_OnFailureTest()
+        public async Task Get_Task_OnFailureTest_404NotFund()
         {
             //Arrange
 
@@ -152,6 +153,95 @@ namespace TodoManager.Test
             //Assets that the result is not Null
             Assert.Empty((System.Collections.IEnumerable) result.Value);
 
+        }
+
+
+        [Fact]
+        public async Task  Post_Task_OnSuccessTest()
+        {
+
+            //Arrange
+            var task = new Models.TaskRequest
+            {
+                Name = "Name 4",
+                Description = "Test Description 3",
+                StartDate = DateTime.Now.AddDays(-1),
+                AllotedTime = 672727200,
+                ElapsedTime = 287442220,
+                Status = true
+            };
+
+            _dataSourceServciceMock.Setup(mockService => mockService.AddTask(task))
+                .ReturnsAsync(testTaskModelList.Count + 1);
+
+            var taskController = new TasksController(_dataSourceServciceMock.Object);
+
+            //************** Act ********************************/
+
+            var result = (CreatedAtActionResult) await taskController.Post(task);
+
+            //************** Assert ********************************/
+
+            //Should return StatusCode 200, on Success
+;
+             Assert.Equal((int)HttpStatusCode.Created, result.StatusCode);
+    
+        }
+
+        [Fact]
+        public async Task Put_Task_OnSuccessTest()
+        {
+
+            //Arrange
+            var task = new Models.TaskRequest
+            {
+                Name = "Name 4b",
+                Description = "Test Description 4",
+            };
+
+            _dataSourceServciceMock.Setup(mockService => mockService.DoesTaskExists(4))
+            .ReturnsAsync(true);
+
+            _dataSourceServciceMock.Setup(mockService => mockService.UpdateTask(4, task))
+                .ReturnsAsync(testTaskModelList.Where(x => x.Id == 4).FirstOrDefault());
+
+            var taskController = new TasksController(_dataSourceServciceMock.Object);
+
+            //************** Act ********************************/
+
+            var result = (AcceptedResult) await taskController.Put(4,task);
+
+            //************** Assert ********************************/
+
+            //Should return StatusCode 202, on Success
+            ;
+            Assert.Equal((int)HttpStatusCode.Accepted, result.StatusCode);
+
+        }
+
+        [Fact]
+        public async Task Delete_Task_OnSuccessTest()
+        {
+            //Arrange
+
+            _dataSourceServciceMock.Setup(mockService => mockService.DoesTaskExists(4))
+            .ReturnsAsync(true);
+
+            _dataSourceServciceMock.Setup(mockService => mockService.DeleteTask(4))
+            .ReturnsAsync(4);
+
+            var taskController = new TasksController(_dataSourceServciceMock.Object);
+
+            //************** Act ********************************/
+
+            var result = (OkObjectResult )await taskController.Delete(4);
+
+            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+
+            //Assets that the result is not Null
+            Assert.NotNull(result);
+
+            Assert.Equal(result.Value, 4);
         }
 
 

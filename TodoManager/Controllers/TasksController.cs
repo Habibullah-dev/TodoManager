@@ -86,9 +86,10 @@ namespace TodoManager.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Models.Task))]
         [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Post([FromBody] TaskRequest request)
         {
-  
+              //Add Task to mock service
             int? id = await dataSourceService.AddTask(request);
 
             if (id != null)
@@ -108,7 +109,7 @@ namespace TodoManager.Controllers
         /// Updates a Task in the DataStore
         /// </summary>
         /// <param name="id">The id of the Task to update</param>
-        /// <param name="request">The details of the Course to be updated</param>
+        /// <param name="request">The details of the Task to be updated</param>
         /// <response code="422">When there is a validation error</response>
         /// <response code="404">When the task was not found by its id</response>
         [HttpPut]
@@ -135,7 +136,7 @@ namespace TodoManager.Controllers
         /// <response code="404">When the task was not found by its id</response>
         [HttpDelete]
         [Route("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
@@ -146,14 +147,10 @@ namespace TodoManager.Controllers
 
             int? taskId = await dataSourceService.DeleteTask(id);
 
-            return Ok();
+            return Ok(taskId);
         }
 
-        [HttpGet("getme/{id}")]
-        public String GetMe(int id)
-        {
-            return $"{nameof(GetMe)}";
-        }
+   
 
     }
 }
