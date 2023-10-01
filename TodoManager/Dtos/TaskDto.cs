@@ -1,5 +1,8 @@
 ﻿namespace TodoManager.Dtos
 {
+    /// <summary>
+    /// This is TaskDTO class for mapping into prefered Response
+    /// </summary>
     public class TaskDto
     {
         public int Id { get; set; }

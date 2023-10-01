@@ -244,6 +244,25 @@ namespace TodoManager.Test
             Assert.Equal(result.Value, 4);
         }
 
+        [Fact]
+        public async Task Delete_Task_OnFailureTest_404NotFount()
+        {
+            //Arrange
+
+            _dataSourceServciceMock.Setup(mockService => mockService.DoesTaskExists(int.MaxValue))
+            .ReturnsAsync(false);
+
+
+            var taskController = new TasksController(_dataSourceServciceMock.Object);
+
+            //************** Act ********************************/
+
+            var result = (NotFoundResult)await taskController.Delete(4);
+
+            Assert.Equal((int)HttpStatusCode.NotFound, result.StatusCode);
+
+          
+        }
 
 
         public Task DisposeAsync()
